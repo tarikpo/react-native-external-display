@@ -12,6 +12,46 @@ type ExternalDisplayOptions = {
   onScreenDisconnect: Function,
 }
 
+
+export const useExternalDisplay = ({
+  onScreenConnect,
+  onScreenChange,
+  onScreenDisconnect,
+} = {}) => {
+  const [screens, setScreens] = useState({});
+
+  useEffect(() => {
+    const { connect, change, disconnect } = listenEvent({
+      onScreenConnect: (info) => {
+        setScreens(info);
+        if (onScreenConnect) onScreenConnect(info);
+      },
+      onScreenChange: (info) => {
+        setScreens(info);
+        if (onScreenChange) onScreenChange(info);
+      },
+      onScreenDisconnect: (info) => {
+        setScreens(info);
+        if (onScreenDisconnect) onScreenDisconnect(info);
+      },
+    });
+
+    // Fetch initial screens after event listeners are set up
+    const initialScreens = getScreens();
+    setScreens(initialScreens);
+
+    return () => {
+      connect.remove();
+      change.remove();
+      disconnect.remove();
+    };
+  }, []);
+
+  return screens;
+};
+
+//////////////
+/*
 export const useExternalDisplay = ({
   onScreenConnect,
   onScreenChange,
@@ -43,3 +83,4 @@ export const useExternalDisplay = ({
 
   return screens
 }
+*/
