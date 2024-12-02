@@ -23,22 +23,30 @@ export const useExternalDisplay = ({
   useEffect(() => {
     const { connect, change, disconnect } = listenEvent({
       onScreenConnect: (info) => {
-        setScreens(info);
+        console.log('onScreenConnect event received:', info);
+
+        setScreens({...info});
         if (onScreenConnect) onScreenConnect(info);
       },
       onScreenChange: (info) => {
-        setScreens(info);
+        console.log('onScreenChange event received:', info);
+
+        setScreens({...info});
         if (onScreenChange) onScreenChange(info);
       },
       onScreenDisconnect: (info) => {
-        setScreens(info);
+        console.log('onScreenDisconnect event received:', info);
+
+        setScreens({...info});
         if (onScreenDisconnect) onScreenDisconnect(info);
       },
     });
 
     // Fetch initial screens after event listeners are set up
     const initialScreens = getScreens();
-    setScreens(initialScreens);
+    console.log('Initial screens:', initialScreens);
+
+    setScreens({...initialScreens});
 
     return () => {
       connect.remove();

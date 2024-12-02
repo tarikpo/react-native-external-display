@@ -22,6 +22,13 @@ export type ScreenInfo = {
 
 export const getScreens = (): ScreenInfo => {
   // Fetch the initial screens when this function is called
+  return {
+    "70":{
+      "id":"69",
+      "width":1920,
+      "height":1080
+    }
+  }
   return getInitialScreens();
 };
 
