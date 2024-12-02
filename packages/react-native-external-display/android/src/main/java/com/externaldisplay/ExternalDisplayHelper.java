@@ -17,6 +17,7 @@ import android.hardware.display.DisplayManager;
 
 import java.util.Map;
 import java.util.HashMap;
+import android.util.Log;
 
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -25,17 +26,24 @@ import com.facebook.react.bridge.ReactApplicationContext;
 class ExternalDisplayScreen extends Presentation {
   ExternalDisplayScreen(Context ctx, Display display) {
     super(ctx, display);
+    Log.d("RNExternalDisplayEvent", "ExternalDisplayScreen init");
+
   }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    Log.d("RNExternalDisplayEvent", "ExternalDisplayScreen onCreate");
+
     super.onCreate(savedInstanceState);
   }
 }
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 class ExternalDisplayHelper implements DisplayManager.DisplayListener {
+  
   public static Map<String, Object> getScreenInfo(Display[] displays) {
+    Log.d("RNExternalDisplayEvent", "ExternalDisplayScreen getScreenInfo");
+
     HashMap<String, Object> info = new HashMap<String, Object>();
     for (Display display : displays) {
       int displayId = display.getDisplayId();
@@ -74,25 +82,35 @@ class ExternalDisplayHelper implements DisplayManager.DisplayListener {
   }
 
   public Display getDisplay(int displayId) {
+    Log.d("RNExternalDisplayEvent", "ExternalDisplayScreen getDisplay");
+
     return dm.getDisplay(displayId);
   }
 
   public Display[] getDisplays() {
+    Log.d("RNExternalDisplayEvent", "ExternalDisplayScreen getDisplays");
+
     return dm.getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION);
   }
 
   @Override
   public void onDisplayAdded(int displayId) {
+    Log.d("RNExternalDisplayEvent", "ExternalDisplayScreen onDisplayAdded");
+
     listener.onDisplayAdded(getDisplays(), displayId);
   }
 
   @Override
   public void onDisplayChanged(int displayId) {
+    Log.d("RNExternalDisplayEvent", "ExternalDisplayScreen onDisplayChanged");
+
     listener.onDisplayChanged(getDisplays(), displayId);
   }
 
   @Override
   public void onDisplayRemoved(int displayId) {
+    Log.d("RNExternalDisplayEvent", "ExternalDisplayScreen onDisplayRemoved");
+
     listener.onDisplayRemoved(getDisplays(), displayId);
   }
 }

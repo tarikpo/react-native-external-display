@@ -7,6 +7,7 @@ import com.facebook.react.bridge.ReactMethod;
 
 import android.view.Display;
 import android.hardware.display.DisplayManager;
+import android.util.Log;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ public class RNExternalDisplayModule extends ReactContextBaseJavaModule {
   
   public RNExternalDisplayModule(ReactApplicationContext context) {
     super(context);
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayModule init");
     reactContext = context;
     dm = (DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
   }
@@ -29,6 +31,8 @@ public class RNExternalDisplayModule extends ReactContextBaseJavaModule {
 
   @Override
   public Map<String, Object> getConstants() {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayModule getConstants");
+
     HashMap<String, Object> map = new HashMap<String, Object>();
     map.put("SCREEN_INFO", ExternalDisplayHelper.getScreenInfo(dm.getDisplays()));
     return map;

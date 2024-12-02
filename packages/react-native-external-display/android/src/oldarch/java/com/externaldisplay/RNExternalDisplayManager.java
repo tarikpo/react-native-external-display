@@ -15,6 +15,7 @@ import com.facebook.react.common.ReactConstants;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.graphics.Rect;
+import android.util.Log;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -29,6 +30,8 @@ public class RNExternalDisplayManager extends ViewGroupManager<RNExternalDisplay
   public RNExternalDisplayManager(ReactApplicationContext reactContext) {
     super();
     this.reactContext = reactContext;
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayManager init");
+
   }
 
   @Override
@@ -38,6 +41,8 @@ public class RNExternalDisplayManager extends ViewGroupManager<RNExternalDisplay
 
   @Override
   public RNExternalDisplayView createViewInstance(ThemedReactContext context) {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayManager createViewInstance");
+
     if (this.helper == null) {
       this.helper = new ExternalDisplayHelper(reactContext, this);
     }
@@ -48,12 +53,16 @@ public class RNExternalDisplayManager extends ViewGroupManager<RNExternalDisplay
 
   @Override
   public void onDropViewInstance(RNExternalDisplayView view) {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayManager onDropViewInstance");
+
     views.remove(view);
     super.onDropViewInstance(view);
     view.onDropInstance();
   }
 
   private void checkScreen() {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayManager checkScreen");
+
     int screenId = -1;
     for (RNExternalDisplayView view : views.values()) {
       int viewScreenId = view.getScreen();
@@ -69,22 +78,30 @@ public class RNExternalDisplayManager extends ViewGroupManager<RNExternalDisplay
 
   @ReactProp(name = "screen")
   public void setScreen(RNExternalDisplayView view, @Nullable String screen) {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayManager setScreen");
+
     view.setScreen(screen);
     checkScreen();
   }
 
   @ReactProp(name = "fallbackInMainScreen", defaultBoolean = false)
   public void setFallbackInMainScreen(RNExternalDisplayView view, boolean fallbackInMainScreen) {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayManager setFallbackInMainScreen");
+
     view.setFallbackInMainScreen(fallbackInMainScreen);
   }
 
   private void sendEvent(String eventName, @Nullable WritableMap params) {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayManager sendEvent:"+eventName);
+
     reactContext
       .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
       .emit(eventName, params);
   }
 
   public void onDisplayAdded(Display[] displays, int displayId) {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayManager onDisplayAdded:"+displayId);
+
     sendEvent(
       "@RNExternalDisplay_screenDidConnect",
       Arguments.makeNativeMap(
@@ -93,6 +110,8 @@ public class RNExternalDisplayManager extends ViewGroupManager<RNExternalDisplay
     );
   }
   public void onDisplayChanged(Display[] displays, int displayId) {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayManager onDisplayChanged:"+displayId);
+
     sendEvent(
       "@RNExternalDisplay_screenDidChange",
       Arguments.makeNativeMap(
@@ -101,6 +120,8 @@ public class RNExternalDisplayManager extends ViewGroupManager<RNExternalDisplay
     );
   }
   public void onDisplayRemoved(Display[] displays, int displayId) {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayManager onDisplayRemoved:"+displayId);
+
     sendEvent(
       "@RNExternalDisplay_screenDidDisconnect",
       Arguments.makeNativeMap(

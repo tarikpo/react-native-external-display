@@ -7,6 +7,7 @@ import com.facebook.react.module.model.ReactModuleInfo;
 import com.facebook.react.module.model.ReactModuleInfoProvider;
 import com.facebook.react.TurboReactPackage;
 import com.facebook.react.uimanager.ViewManager;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,11 +16,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.util.Log;
+import com.externaldisplay.RNExternalDisplayManager;
+import com.externaldisplay.RNExternalDisplayModule;
 
 public class RNExternalDisplayPackage extends TurboReactPackage {
 
   @Override
   public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayPackage createViewManagers");
+
     List<ViewManager> viewManagers = new ArrayList<>();
     viewManagers.add(new RNExternalDisplayManager(reactContext));
     return viewManagers;
@@ -28,6 +33,8 @@ public class RNExternalDisplayPackage extends TurboReactPackage {
   @Nullable
   @Override
   public NativeModule getModule(String name, ReactApplicationContext reactContext) {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayPackage getModule");
+
     if (name.equals(RNExternalDisplayModule.REACT_CLASS)) {
       return new com.externaldisplay.RNExternalDisplayModule(reactContext);
     } else {
@@ -37,6 +44,8 @@ public class RNExternalDisplayPackage extends TurboReactPackage {
 
   @Override
   public ReactModuleInfoProvider getReactModuleInfoProvider() {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayPackage getReactModuleInfoProvider");
+
     return () -> {
       final Map<String, ReactModuleInfo> moduleInfos = new HashMap<>();
       boolean isTurboModule = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;

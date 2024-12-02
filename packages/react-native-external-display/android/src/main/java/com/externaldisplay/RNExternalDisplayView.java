@@ -9,6 +9,7 @@ import com.facebook.react.bridge.ReactContext;
 import android.widget.LinearLayout;
 import com.facebook.common.logging.FLog;
 import com.facebook.react.common.ReactConstants;
+import android.util.Log;
 
 import android.view.Display;
 import android.util.DisplayMetrics;
@@ -30,11 +31,15 @@ public class RNExternalDisplayView extends ReactRootView implements LifecycleEve
     ((ReactContext) context).addLifecycleEventListener(this);
     this.context = context;
     this.helper = helper;
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayView init");
+
   }
 
   @Override
   public void addView(View child, int index) {
     subviews.add(index, child);
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayView addView");
+
     updateScreen();
   }
 
@@ -44,22 +49,30 @@ public class RNExternalDisplayView extends ReactRootView implements LifecycleEve
 
   @Override
   public int getChildCount() {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayView getChildCount");
+
     return subviews.size();
   }
 
   @Override
   public View getChildAt(int index) {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayView getChildAt");
+
     return subviews.get(index);
   }
 
   @Override
   public void removeView(View view) {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayView removeView");
+
     super.removeView(view);
   }
 
   @Override
   public void removeViewAt(int index) {
     View child = getChildAt(index);
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayView removeViewAt");
+
     super.removeView(child);
     subviews.remove(index);
     if (wrap != null) {
@@ -72,6 +85,8 @@ public class RNExternalDisplayView extends ReactRootView implements LifecycleEve
   }
 
   public void onDropInstance() {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayView onDropInstance");
+
     ((ReactContext) getContext()).removeLifecycleEventListener(this);
     if (wrap != null && wrap.getChildCount() > 0) {
       for (int i = 0; i < wrap.getChildCount(); i++) {
@@ -89,6 +104,8 @@ public class RNExternalDisplayView extends ReactRootView implements LifecycleEve
 
   @Override
   public void onHostResume() {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayView onHostResume");
+
     if (displayScreen == null && !pausedWithDisplayScreen) {
       return;
     }
@@ -98,6 +115,8 @@ public class RNExternalDisplayView extends ReactRootView implements LifecycleEve
 
   @Override
   public void onHostPause() {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayView onHostPause");
+
     if (displayScreen == null) {
       return;
     }
@@ -112,11 +131,16 @@ public class RNExternalDisplayView extends ReactRootView implements LifecycleEve
 
   @Override
   public void onHostDestroy() {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayView onHostDestroy");
+
     onDropInstance();
   }
 
   public void updateScreen() {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayView updateScreen");
+
     if (getChildCount() == 0) return;
+    
     if (screen > 0) {
       Display display = helper.getDisplay(screen);
       if (display != null) {
@@ -159,6 +183,8 @@ public class RNExternalDisplayView extends ReactRootView implements LifecycleEve
   }
 
   private void destroyScreen() {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayView destroyScreen");
+
     if (displayScreen != null) {
       displayScreen.hide();
       displayScreen.dismiss();
@@ -168,6 +194,8 @@ public class RNExternalDisplayView extends ReactRootView implements LifecycleEve
   }
 
   public void setScreen(String screen) {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayView setScreen");
+
     if (getChildCount() > 0 && wrap != null && wrap.getChildCount() > 0) {
       for (int i = 0; i < wrap.getChildCount(); i++) {
         wrap.removeViewAt(i);
@@ -191,10 +219,14 @@ public class RNExternalDisplayView extends ReactRootView implements LifecycleEve
   }
 
   public int getScreen() {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayView getScreen");
+
     return this.screen;
   }
 
   public void setFallbackInMainScreen(boolean value) {
+    Log.d("RNExternalDisplayEvent", "RNExternalDisplayView setFallbackInMainScreen");
+
     this.fallbackInMainScreen = value;
   }
 }
