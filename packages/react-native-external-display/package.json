@@ -2,7 +2,9 @@
   "name": "react-native-external-display",
   "version": "0.6.6",
   "description": "React Native view renderer in External Display",
-  "scripts": {},
+  "scripts": {
+    "build": "babel js --out-dir lib"
+  },
   "author": "Jhen-Jie Hong <developer@jhen.me>",
   "homepage": "https://github.com/mybigday/react-native-external-display",
   "repository": "https://github.com/mybigday/react-native-external-display",
@@ -23,5 +25,13 @@
     "name": "RNExternalDisplaySpec",
     "type": "all",
     "jsSrcsDir": "./js/"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.25.9",
+    "@babel/plugin-transform-flow-strip-types": "^7.25.9",
+    "@babel/preset-env": "^7.26.0"
+  },
+  "dependencies": {
+    "@babel/core": "^7.26.0"
   }
 }
