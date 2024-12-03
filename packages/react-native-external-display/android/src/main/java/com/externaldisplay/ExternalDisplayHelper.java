@@ -17,6 +17,7 @@ import android.hardware.display.DisplayManager;
 
 import java.util.Map;
 import java.util.HashMap;
+
 import android.util.Log;
 
 import com.facebook.react.bridge.LifecycleEventListener;
@@ -24,93 +25,119 @@ import com.facebook.react.bridge.ReactApplicationContext;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 class ExternalDisplayScreen extends Presentation {
-  ExternalDisplayScreen(Context ctx, Display display) {
-    super(ctx, display);
-    Log.d("RNExternalDisplayEvent", "ExternalDisplayScreen init");
+    ExternalDisplayScreen(Context ctx, Display display) {
+        super(ctx, display);
+        Log.d("RNExternalDisplayEvent", "ExternalDisplayScreen init");
 
-  }
+    }
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    Log.d("RNExternalDisplayEvent", "ExternalDisplayScreen onCreate");
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        Log.d("RNExternalDisplayEvent", "ExternalDisplayScreen onCreate");
 
-    super.onCreate(savedInstanceState);
-  }
+        super.onCreate(savedInstanceState);
+    }
 }
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 class ExternalDisplayHelper implements DisplayManager.DisplayListener {
-  
-  public static Map<String, Object> getScreenInfo(Display[] displays) {
-    Log.d("RNExternalDisplayEvent", "ExternalDisplayScreen getScreenInfo");
+    private static final String TAG = "RNExternalDisplayEvent";
+    private static ExternalDisplayHelper instance = null;
+    private DisplayManager dm = null;
+    private Listener listener = null;
+    private Display displays = null;
 
-    HashMap<String, Object> info = new HashMap<String, Object>();
-    for (Display display : displays) {
-      int displayId = display.getDisplayId();
-      if (
-        display.getDisplayId() == Display.DEFAULT_DISPLAY ||
-        (display.getFlags() & Display.FLAG_PRESENTATION) == 0
-      ) {
-        continue;
-      }
-      HashMap<String, Object> data = new HashMap<String, Object>();
-      DisplayMetrics displayMetrics = new DisplayMetrics();
-      display.getMetrics(displayMetrics);
-      data.put("id", displayId);
-      data.put("width",  displayMetrics.widthPixels);
-      data.put("height", displayMetrics.heightPixels);
-      info.put(String.valueOf(display.getDisplayId()), data);
+    // Private constructor to prevent direct instantiation
+    private ExternalDisplayHelper(Context context, Listener listener) {
+        this.listener = listener;
+        dm = (DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
+        if (dm != null) {
+            dm.registerDisplayListener(this, null);
+        } else {
+        }
     }
-    return info;
-  }
 
-  public interface Listener {
-    void onDisplayAdded(Display[] displays, int displayId);
-    void onDisplayChanged(Display[] displays, int displayId);
-    void onDisplayRemoved(Display[] displays, int displayId);
-  }
+    // Method to initialize the singleton instance
+    public static synchronized void initialize(Context context, Listener listener) {
+        if (instance == null) {
+            instance = new ExternalDisplayHelper(context.getApplicationContext(), listener);
+        }
+    }
 
-  private Listener listener = null;
-  private DisplayManager dm = null;
-  private Display displays = null;
+    // Method to get the singleton instance
+    public static synchronized ExternalDisplayHelper getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("ExternalDisplayHelper is not initialized. Call initialize() first.");
+        }
+        return instance;
+    }
 
-  public ExternalDisplayHelper(Context context, Listener listener) {
-    this.listener = listener;
+    // Method to clean up the singleton instance
+    public static synchronized void destroy() {
+        if (instance != null && instance.dm != null) {
+            instance.dm.unregisterDisplayListener(instance);
+            instance = null;
+        }
+    }
+    public static Map<String, Object> getScreenInfo(Display[] displays) {
+        HashMap<String, Object> info = new HashMap<>();
+        for (Display display : displays) {
+            int displayId = display.getDisplayId();
+            if (
+                    display.getDisplayId() == Display.DEFAULT_DISPLAY ||
+                            (display.getFlags() & Display.FLAG_PRESENTATION) == 0
+            ) {
+                continue;
+            }
+            HashMap<String, Object> data = new HashMap<>();
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            display.getMetrics(displayMetrics);
+            data.put("id", displayId);
+            data.put("width", displayMetrics.widthPixels);
+            data.put("height", displayMetrics.heightPixels);
+            info.put(String.valueOf(display.getDisplayId()), data);
+        }
+        return info;
+    }
 
-    dm = (DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
-    dm.registerDisplayListener(this, null);
-  }
+    @Override
+    public void onDisplayAdded(int displayId) {
+        if (listener != null) {
+            listener.onDisplayAdded(getDisplays(), displayId);
+        }
+    }
 
-  public Display getDisplay(int displayId) {
-    Log.d("RNExternalDisplayEvent", "ExternalDisplayScreen getDisplay");
+    @Override
+    public void onDisplayChanged(int displayId) {
+        if (listener != null) {
+            listener.onDisplayChanged(getDisplays(), displayId);
+        }
+    }
 
-    return dm.getDisplay(displayId);
-  }
+    @Override
+    public void onDisplayRemoved(int displayId) {
+        if (listener != null) {
+            listener.onDisplayRemoved(getDisplays(), displayId);
+        }
+    }
 
-  public Display[] getDisplays() {
-    Log.d("RNExternalDisplayEvent", "ExternalDisplayScreen getDisplays");
+    public Display getDisplay(int displayId) {
+        if (dm != null) {
+            return dm.getDisplay(displayId);
+        }
+        return null;
+    }
 
-    return dm.getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION);
-  }
+    public Display[] getDisplays() {
+        if (dm != null) {
+            return dm.getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION);
+        }
+        return new Display[0];
+    }
 
-  @Override
-  public void onDisplayAdded(int displayId) {
-    Log.d("RNExternalDisplayEvent", "ExternalDisplayScreen onDisplayAdded");
-
-    listener.onDisplayAdded(getDisplays(), displayId);
-  }
-
-  @Override
-  public void onDisplayChanged(int displayId) {
-    Log.d("RNExternalDisplayEvent", "ExternalDisplayScreen onDisplayChanged");
-
-    listener.onDisplayChanged(getDisplays(), displayId);
-  }
-
-  @Override
-  public void onDisplayRemoved(int displayId) {
-    Log.d("RNExternalDisplayEvent", "ExternalDisplayScreen onDisplayRemoved");
-
-    listener.onDisplayRemoved(getDisplays(), displayId);
-  }
+    public interface Listener {
+        void onDisplayAdded(Display[] displays, int displayId);
+        void onDisplayChanged(Display[] displays, int displayId);
+        void onDisplayRemoved(Display[] displays, int displayId);
+    }
 }
